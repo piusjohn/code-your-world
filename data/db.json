@@ -1,0 +1,107 @@
+{
+  "users": [
+    {
+      "id": "58d363284e4fc076",
+      "name": "Admin User",
+      "email": "admin@cyw.dev",
+      "password": "3e866c8a987b5487be21a90bb14e454c:b14a2abff4b42fc31726c129f0e344026a2b1ec82f3b424611cfb3309c79c95b",
+      "role": "admin"
+    },
+    {
+      "id": "35e2a000d68a229b",
+      "name": "Alex Morgan",
+      "email": "alex@cyw.dev",
+      "password": "e7bc7e604b2dbe3333799f86261ca15c:b8b5a380320855b09105952abdaf435ef40c1b2ec10da21fb9f128eb7f899748",
+      "role": "student"
+    },
+    {
+      "id": "5dd901d077b8f26e",
+      "name": "Sam Kim",
+      "email": "sam@cyw.dev",
+      "password": "74298143ef878d8e5878e264cf10f1a6:7d60516bf430964dbb3f55960dabb4ac7ffe0f92d64abc680daf3cff726007ec",
+      "role": "student"
+    },
+    {
+      "id": "553a7751dfe91c72",
+      "name": "Jamie Reed",
+      "email": "jamie@cyw.dev",
+      "password": "5207b25fd1e28cb8f65a418e45a66170:0d55bb6e8ea363bbbf2bb0f94c57c62ed954930b9614da67c284b44e379f3c0b",
+      "role": "student"
+    }
+  ],
+  "projects": [
+    {
+      "id": "db6f7f68788972b6",
+      "title": "Command-line habit tracker",
+      "category": "IMPERATIVE",
+      "order": 1,
+      "active": false,
+      "markdown": "# Command-line habit tracker\n\nBuild a CLI that records habits and reports streaks.\n\n## Requirements\n\n- Parse commands and flags\n- Add and remove habits\n- Persist data between runs\n- Include automated tests"
+    },
+    {
+      "id": "9921f3fdb9c6771b",
+      "title": "GO-REFRESH",
+      "category": "IMPERATIVE",
+      "order": 1,
+      "markdown": "## go-reloaded\n\nWelcome back. Congratulations on your admission. We knew you would make it. Now it is time to get into projects.\n\n### Objectives\n\nIn this project you will use some of your old functions made in your old repository. You will use them with the objective of making a simple text completion/editing/auto-correction tool.\n\nOne more detail. This time the project will be corrected by auditors. The auditors will be other students and you will be an auditor as well.\n\nWe advise you to create your own tests for yourself and for when you will correct your auditees.\n\n### Introduction\n\n- Your project must be written in **Go**.\n- The code should respect the [**good practices**](../good-practices/README.md).\n- It is recommended to have **test files** for [unit testing](https://go.dev/doc/tutorial/add-a-test).\n\nThe tool you are about to build will receive as arguments the name of a file containing a text that needs some modifications (the input) and the name of the file the modified text should be placed in (the output). Next is a list of possible modifications that your program should execute:\n\n- Every instance of `(hex)` should replace the word before with the decimal version of the word (in this case the word will always be a hexadecimal number). (Ex: \"1E (hex) files were added\" -> \"30 files were added\")\n- Every instance of `(bin)` should replace the word before with the decimal version of the word (in this case the word will always be a binary number). (Ex: \"It has been 10 (bin) years\" -> \"It has been 2 years\")\n- Every instance of `(up)` converts the word before with the Uppercase version of it. (Ex: \"Ready, set, go (up) !\" -> \"Ready, set, GO!\")\n- Every instance of `(low)` converts the word before with the Lowercase version of it. (Ex: \"I should stop SHOUTING (low)\" -> \"I should stop shouting\")\n- Every instance of `(cap)` converts the word before with the capitalized version of it. (Ex: \"Welcome to the Brooklyn bridge (cap)\" -> \"Welcome to the Brooklyn Bridge\")\n\n  - For `(low)`, `(up)`, `(cap)` if a number appears next to it, like so: `(low, <number>)` it turns the previously specified number of words in lowercase, uppercase or capitalized accordingly. (Ex: \"This is so exciting (up, 2)\" -> \"This is SO EXCITING\")\n\n- Every instance of the punctuations `.`, `,`, `!`, `?`, `:` and `;` should be close to the previous word and with space apart from the next one. (Ex: \"I was sitting over there ,and then BAMM !!\" -> \"I was sitting over there, and then BAMM!!\").\n  - Except if there are groups of punctuation like: `...` or `!?`. In this case the program should format the text as in the following example: \"I was thinking ... You were right\" -> \"I was thinking... You were right\".\n- The punctuation mark `'` will always be found with another instance of it and they should be placed to the right and left of the word in the middle of them, without any spaces. (Ex: \"I am exactly how they describe me: ' awesome '\" -> \"I am exactly how they describe me: 'awesome'\")\n  - If there are more than one word between the two `' '` marks, the program should place the marks next to the corresponding words (Ex: \"As Elton John said: ' I am the most well-known homosexual in the world '\" -> \"As Elton John said: 'I am the most well-known homosexual in the world'\")\n- Every instance of `a` should be turned into `an` if the next word begins with a vowel (`a`, `e`, `i`, `o`, `u`) or a `h`. (Ex: \"There it was. A amazing rock!\" -> \"There it was. An amazing rock!\").\n\n### Allowed packages\n\n- [Standard Go](https://golang.org/pkg/) packages are allowed.\n\n### Usage\n\n```console\n$ cat sample.txt\nit (cap) was the best of times, it was the worst of times (up) , it was the age of wisdom, it was the age of foolishness (cap, 6) , it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of darkness, it was the spring of hope, IT WAS THE (low, 3) winter of despair.\n$ go run . sample.txt result.txt\n$ cat result.txt\nIt was the best of times, it was the worst of TIMES, it was the age of wisdom, It Was The Age Of Foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of darkness, it was the spring of hope, it was the winter of despair.\n$ cat sample.txt\nSimply add 42 (hex) and 10 (bin) and you will see the result is 68.\n$ go run . sample.txt result.txt\n$ cat result.txt\nSimply add 66 and 2 and you will see the result is 68.\n$ cat sample.txt\nThere is no greater agony than bearing a untold story inside you.\n$ go run . sample.txt result.txt\n$ cat result.txt\nThere is no greater agony than bearing an untold story inside you.\n$ cat sample.txt\nPunctuation tests are ... kinda boring ,what do you think ?\n$ go run . sample.txt result.txt\n$ cat result.txt\nPunctuation tests are... kinda boring, what do you think?\n```\n\nThis project will help you learn about :\n\n- The Go file system(**fs**) API\n- String and numbers manipulation\n",
+      "active": true
+    },
+    {
+      "id": "44439c3822dfa170",
+      "title": "Test API Project",
+      "category": "FULL-STACK",
+      "order": 1,
+      "markdown": "# Test API Project\n\n- Build it",
+      "active": false
+    }
+  ],
+  "submissions": [
+    {
+      "id": "221468a294cb8b11",
+      "projectId": "db6f7f68788972b6",
+      "userId": "35e2a000d68a229b",
+      "repository": "https://github.com/you/project",
+      "status": "in_audit",
+      "createdAt": "2026-09-10T11:56:13.727Z"
+    },
+    {
+      "id": "707e4c4ac42e8371",
+      "projectId": "9921f3fdb9c6771b",
+      "userId": "35e2a000d68a229b",
+      "repository": "https://github.com/you/project",
+      "status": "in_audit",
+      "createdAt": "2026-09-10T17:21:46.548Z"
+    }
+  ],
+  "auditAssignments": [
+    {
+      "id": "97c3e635e4bdac2f",
+      "submissionId": "221468a294cb8b11",
+      "auditorId": "5dd901d077b8f26e",
+      "code": "CYW-A3AE37",
+      "status": "pending"
+    },
+    {
+      "id": "7bb9359af9778db5",
+      "submissionId": "221468a294cb8b11",
+      "auditorId": "553a7751dfe91c72",
+      "code": "CYW-3A10F9",
+      "status": "pending"
+    },
+    {
+      "id": "ed201257c0edd404",
+      "submissionId": "707e4c4ac42e8371",
+      "auditorId": "553a7751dfe91c72",
+      "code": "CYW-B35B9B",
+      "status": "pending"
+    },
+    {
+      "id": "268615a80bfb0a07",
+      "submissionId": "707e4c4ac42e8371",
+      "auditorId": "5dd901d077b8f26e",
+      "code": "CYW-CCF741",
+      "status": "pending"
+    }
+  ],
+  "audits": []
+}
