@@ -4,6 +4,8 @@ import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { extname, join, normalize } from 'node:path';
 
 const PORT = Number(process.env.PORT || 4173);
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
 const DATA_DIR = join(process.cwd(), 'data');
 const DB_FILE = join(DATA_DIR, 'db.json');
 const sessions = new Map();
@@ -30,6 +32,15 @@ const body = async (req) => { let raw = ''; for await (const chunk of req) { raw
 const cookies = (req) => Object.fromEntries((req.headers.cookie || '').split(';').filter(Boolean).map(v => v.trim().split('=')));
 const publicUser = ({ password, ...user }) => user;
 const currentUser = (req, db) => db.users.find(u => u.id === sessions.get(cookies(req).cyw_session));
+const supabaseUser = async (req) => {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
+  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+  if (!token) return null;
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` } });
+  if (!response.ok) return null;
+  const remote = await response.json();
+  return { id: remote.id, email: remote.email, name: remote.user_metadata?.full_name || remote.user_metadata?.name || remote.email?.split('@')[0] || 'Learner', role: remote.app_metadata?.role || 'student' };
+};
 const eligible = (db, project, userId) => {
   const ordered = db.projects.filter(p => p.active).sort((a,b) => categories.indexOf(a.category)-categories.indexOf(b.category) || a.order-b.order);
   const index = ordered.findIndex(p => p.id === project.id); if (index <= 0) return true;
@@ -37,9 +48,10 @@ const eligible = (db, project, userId) => {
 };
 
 async function api(req, res, url, db) {
+  if (req.method === 'GET' && url.pathname === '/api/config') return json(res, 200, { supabaseUrl: SUPABASE_URL, supabaseAnonKey: SUPABASE_ANON_KEY });
   if (req.method === 'POST' && url.pathname === '/api/login') { const data = await body(req); const user = db.users.find(u => u.email.toLowerCase() === String(data.email).toLowerCase()); if (!user || !verify(data.password || '', user.password)) return json(res, 401, { error: 'Invalid email or password' }); const token = randomBytes(24).toString('hex'); sessions.set(token, user.id); return json(res, 200, { user: publicUser(user) }, { 'set-cookie': `cyw_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=86400` }); }
   if (req.method === 'POST' && url.pathname === '/api/logout') { sessions.delete(cookies(req).cyw_session); return json(res, 200, { ok: true }, { 'set-cookie': 'cyw_session=; HttpOnly; Path=/; Max-Age=0' }); }
-  const user = currentUser(req, db); if (!user) return json(res, 401, { error: 'Authentication required' });
+  const user = await supabaseUser(req) || currentUser(req, db); if (!user) return json(res, 401, { error: 'Authentication required' });
   if (req.method === 'GET' && url.pathname === '/api/me') return json(res, 200, { user: publicUser(user) });
   if (req.method === 'GET' && url.pathname === '/api/dashboard') {
     const projects = db.projects.filter(p => p.active).sort((a,b) => categories.indexOf(a.category)-categories.indexOf(b.category) || a.order-b.order).map(p => ({ ...p, unlocked: eligible(db,p,user.id), submission: db.submissions.find(s => s.projectId === p.id && s.userId === user.id) || null }));
